@@ -10,6 +10,12 @@ Previous steps:
 
 Deduplication is needed for an increased accuracy in variant calling, that will have to be performed later on. **But when do we want to perform deduplication?**
 
+
+
+A main point that we have to implement inside our pipeline is the proper determination of the tumoral bam and the normal bam. Because in the task of the ancestry only the normal bam is needed.
+
+
+
 # Task #1
 
 Easy peasy, example for Normal.bam
@@ -108,6 +114,49 @@ ava -jar GATK/GenomeAnalysisTK.jar -T UnifiedGenotyper -R human_g1k_v37.fasta
 
 ### Genotype identification ---> heterozygosity
 
+The **-GF** field gives us information about the genotype. I don't think we should really care about.
 
+I suppose we don't need to check for phased SNPs because they're relative to the haplotype.
+
+This command, taken from [biostars](https://www.biostars.org/p/166260/) 
+
+```bash
+vcftools --gzvcf file.vcf.gz --extract-FORMAT-info GT | grep "0/1"
+```
+
+Is about regardless of the phasing. Given that we don't have paternal and maternal SNPs Maybe they're not supposed to be "|" separated.
+
+<u>**Haplotype caller from GATK???**</u>
+
+May be a possibility and it has multiple uses.
+
+
+
+### Difference With clinvar file
+
+Easy peasy with vcftools
+
+```bash
+vcftools --vcf Sample.BCF.recode.vcf --diff Sample.GATK.recode.vcf –diff-site
+
+```
+
+# Task #4
+
+We can implement this task in this way:
+
+1. We write the sample name into a file in this way 
+   
+   ```bash
+   echo 'Normal.bam' > BAMs_List.txt
+   ```
+
+2. Use his script but **we have to install his package**
+   
+   ```bash
+   Rscript RunEthSEQ.R
+   ```
+
+From which we can retrieve the report
 
 
