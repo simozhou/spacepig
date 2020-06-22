@@ -62,11 +62,13 @@ There are
 
 ###### Task point #1
 
-How to determine aligned reads?
+How to determine realigned reads?
 
-- Grep for the aligned (@OC)
+- Grep for the old CIGAR indicator ("OC:") in the additional fields of the realigned bam file
 
-- Command not known
+```{bash}
+samtools view realigned.bam | grep -c '\sOC:'
+```
 
 ##### Recalibration #2.3
 
