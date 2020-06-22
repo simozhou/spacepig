@@ -2,6 +2,8 @@ Reference for parallelism:  [GATK PARALLEL](https://gatkforums.broadinstitute.or
 
 Previous steps:
 
+- Correct wrong header format
+
 - Sort
 
 - Index
@@ -14,6 +16,12 @@ Deduplication is needed for an increased accuracy in variant calling, that will 
 
 A main point that we have to implement inside our pipeline is the proper determination of the tumoral bam and the normal bam. Because in the task of the ancestry only the normal bam is needed.
 
+
+To correct for wrong header format, samtools reheader can be used, flanked by a sed command. Example for Normal.bam
+
+```bash
+samtools reheader -c "sed '/^@RG/ s/\([A-Z][A-Z]\)ID/\1/g'" Normal.bam > Normal.RGcorrected.bam
+```
 
 
 # Task #1
