@@ -136,7 +136,7 @@ I suppose we don't need to check for phased SNPs because they're relative to the
 Example for Sample.GATK.vcf
 
 ```bash
-grep 0[/\|]1 Sample.GATK.vcf > Sample.GATK.Het.vcf
+grep "0[/\|]1" Sample.GATK.vcf > Sample.GATK.Het.vcf
 ```
 
 Is about regardless of the phasing. Given that we don't have paternal and maternal SNPs Maybe they're not supposed to be "|" separated.
@@ -147,13 +147,14 @@ May be a possibility and it has multiple uses.
 
 
 
-### Difference With clinvar file
+### Intersection With clinvar file
 
 Easy peasy with vcftools
 
+We may also apply a filter for quality to our results before intersecting to see how many variants we loose in the final result
+
 ```bash
 vcftools --vcf Sample.BCF.recode.vcf --diff Sample.GATK.recode.vcf –diff-site
-
 ```
 
 # Task #4
@@ -174,4 +175,18 @@ We can implement this task in this way:
 
 From which we can retrieve the report
 
+# Task #5
+To get raw CNV results from Normal.bam and Tumor.bam
+```bash
+samtools mpileup -q 1 -f ../../Annotations/human_g1k_v37.fasta Normal.bam Tumor.bam | java -jar ../../Tools/VarScan.v2.3.9.jar copynumber --output-file SCNA --mpileup 1
+```
 
+To adjust CNV data for GC content sequencing bias
+```bash
+java -jar ../../Tools/VarScan.v2.3.9.jar copyCaller SCNA.copynumber --output-file SCNA.copynumber.called
+```
+
+To retrieve and visualize CNV segments
+```bash
+Rscript CBS.R
+```
