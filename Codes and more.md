@@ -36,15 +36,15 @@ samtools stats Normal.bam | grep ^SN | cut -f 2- > bamstats.txt
 
 Realignment command for both BAM files
 
-##### Target creation  #2.1
+##### Target creation  #2.1.1
 
-This is an example for Normal.bam and realigner target creator
+This is an example for Normal.bam and realigner target creator, on selected regions of the whole exome sequencing experiment
 
 ```bash
-java –jar GenomeAnalysisTK.jar –T RealignerTargetCreator  –R human.fasta –I    Normal.bam    –known    indels.vcf –o realigner.intervals    
+java –jar GenomeAnalysisTK.jar –T RealignerTargetCreator  –R human.fasta –I    Normal.bam    –known    indels.vcf –o realigner.intervals -L Haloplex_Regions.chr16.17.19.bed     
 ```
 
-##### Target realigner #2.2
+##### Target realigner #2.1.2
 
 There's the possibility of using the smith waterman algorithm, but it's computationally expensive for what regards the realignment.
 
@@ -53,14 +53,12 @@ For what regards multitheading IndelRealigner has a scatter and gather approach.
 ```{bash}
 java    
  –jar    
- GenomeAnalysisTK.jar    –T    IndelRealigner    –R    human.fasta    –I    original.bam    –known    indels.vcf    –targetIntervals    realigner.intervals     –o    realigned.bam    
+ GenomeAnalysisTK.jar    –T    IndelRealigner    –R    human.fasta    –I    original.bam    –known    indels.vcf    –targetIntervals    realigner.intervals     –o    realigned.bam    -L Haloplex_Regions.chr16.17.19.bed
 ```
 
 For these two commands obviously the bam files become normal and tumor. The fasta file is the human genome file found on the annotation folder. Called **<mark>human_g1k_v37.fasta</mark>**
 
-There are 
-
-###### Task point #1
+###### Quantify realinged reads #2.1.3
 
 How to determine realigned reads?
 
@@ -70,7 +68,7 @@ How to determine realigned reads?
 samtools view realigned.bam | grep -c '\sOC:'
 ```
 
-##### Recalibration #2.3
+##### Recalibration #2.2
 
 For the recalibration we need first a table.
 
@@ -79,7 +77,7 @@ For this command we can assign `-nct / --num_cpu_threads_per_data_thread`  contr
 Obvously we have to insert the whole genome
 
 ```bash
-java    –jar    GenomeAnalysisTK.jar  –T     BaseRecalibrator    –R  human.fasta     –I  realigned.bam  –knownSites     dbsnp137.vcf       –knownSites gold.standard.indels.vcf –o    recal.table    
+java    –jar    GenomeAnalysisTK.jar  –T     BaseRecalibrator    –R  human.fasta     –I  realigned.bam  –knownSites     dbsnp137.vcf       –knownSites gold.standard.indels.vcf –o    recal.table -L Haloplex_Regions.chr16.17.19.bed   
 ```
 
 Now we have to recalibrate our bam file. PrintReads supports nct as the previous step.
@@ -88,7 +86,11 @@ Now we have to recalibrate our bam file. PrintReads supports nct as the previous
 java    –jar GenomeAnalysisTK.jar     –T    PrintReads    –R    human.fasta    –I     realigned.bam    –BQSR    recal.table    –o    recal.bam    
 ```
 
-And to produce before and after plot. We have to use the tables in such code
+And to produce before and after plot. To do so we need to use again BaseRecalibrator to produce the after recalibration table.
+
+```bash
+java    –jar    GenomeAnalysisTK.jar  –T     BaseRecalibrator    –R  human.fasta     –I  realigned.bam  –knownSites     dbsnp137.vcf       –knownSites gold.standard.indels.vcf  -BQSR recal.table  –o    after_recal.table -L Haloplex_Regions.chr16.17.19.bed   
+```
 
 ```bash
 java    –jar    GenomeAnalysisTK.jar    –T    AnalyzeCovariates    –R    human.fasta    –before    recal.table    –after    after_recal.table    –plots    recal_plots.pdf    
