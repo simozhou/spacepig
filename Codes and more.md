@@ -83,7 +83,7 @@ java    –jar    GenomeAnalysisTK.jar  –T     BaseRecalibrator    –R  human
 Now we have to recalibrate our bam file. PrintReads supports nct as the previous step.
 
 ```bash
-java    –jar GenomeAnalysisTK.jar     –T    PrintReads    –R    human.fasta    –I     realigned.bam    –BQSR    recal.table    –o    recal.bam    
+java    –jar GenomeAnalysisTK.jar     –T    PrintReads    –R    human.fasta    –I     realigned.bam    –BQSR    recal.table    –o    recal.bam  -L Haloplex_Regions.chr16.17.19.bed
 ```
 
 And to produce before and after plot. To do so we need to use again BaseRecalibrator to produce the after recalibration table.
@@ -98,7 +98,9 @@ java    –jar    GenomeAnalysisTK.jar    –T    AnalyzeCovariates    –R    h
 
 # Task #3
 
-In order to perform the variant calling we can use
+### {{{[[[(((
+
+In order to perform the variant calling we've been asked to use GATK UnifiedGenotyper
 
 1.  GATK without the -L flag
 
@@ -114,14 +116,15 @@ bcftools has also a **--threads** *INT*  option to define the threads
 bcftools mpileup -Ou -a DP -f human_g1k_v37.fasta Sample.sorted.bam |
 bcftools call -Ov -c -v > Sample.BCF.vcf
 ```
-
+### )))]]]}}}
 #### gatk code without the -L
+
+In order to perform the variant calling we've been asked to use GATK UnifiedGenotyper
 
 The -L flag leads to a focus on a specific area
 
 ```bash
-ava -jar GATK/GenomeAnalysisTK.jar -T UnifiedGenotyper -R human_g1k_v37.fasta
--I Sample.sorted.bam -o Sample.GATK.vcf 
+java -jar GATK/GenomeAnalysisTK.jar -T UnifiedGenotyper -R human_g1k_v37.fasta -I Sample.sorted.bam -o Sample.GATK.vcf -L Haloplex_Regions.chr16.17.19.bed
 ```
 
 ### Genotype identification ---> heterozygosity
@@ -130,10 +133,10 @@ The **-GF** field gives us information about the genotype. I don't think we shou
 
 I suppose we don't need to check for phased SNPs because they're relative to the haplotype.
 
-This command, taken from [biostars](https://www.biostars.org/p/166260/) 
+Example for Sample.GATK.vcf
 
 ```bash
-vcftools --gzvcf file.vcf.gz --extract-FORMAT-info GT | grep "0/1"
+grep 0[/\|]1 Sample.GATK.vcf > Sample.GATK.Het.vcf
 ```
 
 Is about regardless of the phasing. Given that we don't have paternal and maternal SNPs Maybe they're not supposed to be "|" separated.
