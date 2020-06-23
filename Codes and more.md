@@ -191,3 +191,4 @@ accept them as input from shell.
 ```bash
 Rscript CBS.R
 ```
+The R script produces a table which can be visualized on IGV to isolate segments with heterozigous deletions.
