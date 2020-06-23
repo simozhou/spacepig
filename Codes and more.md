@@ -186,7 +186,8 @@ To adjust CNV data for GC content sequencing bias
 java -jar ../../Tools/VarScan.v2.3.9.jar copyCaller SCNA.copynumber --output-file SCNA.copynumber.called
 ```
 
-To retrieve and visualize CNV segments
+To retrieve and visualize CNV segments. Should modify the R script to work in the right directories internally or to 
+accept them as input from shell.
 ```bash
 Rscript CBS.R
 ```
