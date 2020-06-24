@@ -136,7 +136,7 @@ I suppose we don't need to check for phased SNPs because they're relative to the
 Example for Sample.GATK.vcf
 
 ```bash
-grep "0[/\|]1" Sample.GATK.vcf > Sample.GATK.Het.vcf
+bcftools filter -i 'GT="0/1" | GT="0|1"' -o Normal.snps.het.vcf Normal.snps.vcf
 ```
 
 Is about regardless of the phasing. Given that we don't have paternal and maternal SNPs Maybe they're not supposed to be "|" separated.
